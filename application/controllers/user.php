@@ -20,12 +20,67 @@ class User extends CI_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		//$this->load->model('Users_model');
 	}
+	
+	/**
+   * encript the password 
+   * @return mixed
+   */	
+  function __encrip_password($password) {
+    return md5($password);
+  }	
+		
 	public function index()
 	{
-		$this->load->view('project/template/login');
-	}
+		$this->output->enable_profiler(TRUE);
+		if($this->session->userdata('is_logged_in'))
+		{	
+			redirect('admin');
+		} 
+		else
+		{
+			$this->form_validation->set_rules('username', 'Username', 'required');
+			$this->form_validation->set_rules('password', 'Password', 'required');
+			if ($this->form_validation->run() == FALSE)
+			{
+				$this->load->view('project/template/login');
+			}
+			else
+			{	
+				$this->load->model('Users_model');
+				$user_name = $this->input->post('username');
+				$password = $this->__encrip_password($this->input->post('password'));
 
+				$is_valid = $this->Users_model->validate_user_login($user_name, $password);
+				
+				if($is_valid)
+				{
+					$data = array(
+						'username' => $user_name,
+						'is_logged_in' => true
+					);
+					$this->session->set_userdata($data);
+					redirect('admin');
+				}
+				else // incorrect username or password
+				{
+					$data['message_error'] = TRUE;
+					$this->load->view('project/template/login');
+				}
+			}
+		}		
+	}
+	
+	/**
+   * Destroy the session, and logout the user.
+   * @return void
+   */		
+	function logout()
+	{
+		$this->session->sess_destroy();
+		redirect('user');
+	}
 }
 
 /* End of file welcome.php */

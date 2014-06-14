@@ -2,11 +2,13 @@
 $username = array(
 	'name' => 'username',
 	'id' => 'username',
+	'value' => set_value('username'),
 	//'style' => 'width:50%',
 );
 $password = array(
 	'name' => 'password',
 	'id' => 'password',
+	'value' => set_value('password'),
 	//'style' => 'width:50%',
 );
 $submit = array(
